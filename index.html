@@ -10,6 +10,13 @@ body#main {
   background: #afb2bd;
 }
 
+#share-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 4px;
+}
+
 #device-background {
   width: 565px;
   height: 900px;
@@ -38,19 +45,26 @@ body#main {
 var stringData = 'What time is it?';
 var overlayText = '00:00';
 var encoder;
+var demoStringData = 'http://andyehou.github.io/qr_code';
+var useDemoString = false;
 var drawSeparator = true;
 
 
 var init = function() {
-  window.setInterval(function() {
-    var now = new Date();
-    var hours = now.getHours() % 12;
-    if (hours == 0) hours = 12;
-    overlayText = hours + (drawSeparator ? ':' : ' ') + pad('' + now.getMinutes(), 2);
-    stringData = now.toDateString() + ', ' + now.toLocaleTimeString();
-    draw();
-    //drawSeparator = !drawSeparator;
-  }, 1000);
+  render();
+  window.setInterval(render, 1000);
+};
+
+
+var render = function() {
+  var now = new Date();
+  var hours = now.getHours() % 12;
+  if (hours == 0) hours = 12;
+  overlayText = hours + (drawSeparator ? ':' : ' ') + pad('' + now.getMinutes(), 2);
+  var dateTimeText = now.toDateString() + ', ' + now.toLocaleTimeString();
+  stringData = useDemoString ? demoStringData : dateTimeText;
+  draw();
+  //drawSeparator = !drawSeparator;
 };
 
 
@@ -62,10 +76,32 @@ var pad = function(string, length) {
 };
 
 
+var setUseDemoString = function(isUse) {
+  useDemoString = isUse;
+  render();
+};
+
+
+var shareClick = function() {
+  var main = document.getElementById('main');
+  var shareLink = document.getElementById('share-link');
+  var shareMsg = document.getElementById('share-msg');
+  if (useDemoString) {
+    setUseDemoString(false);
+    main.style.background = '#afb2bd';
+    shareLink.innerHTML = 'Share QR Code';
+  } else {
+    setUseDemoString(true);
+    main.style.background = '#FFAA55';
+    shareLink.innerHTML = 'Back to time QR Code';
+  }
+};
+
+
 var draw = function() {
   var canvas = document.getElementById('watchface');
   var drawSize = 11;
-  encoder = new qr.Encoder(stringData, 3);
+  encoder = new qr.Encoder(stringData);
   encoder.drawMatrix(canvas, drawSize);
   var overlayMatrix = generateOverlay(overlayText, encoder.version);
   encoder.drawMatrixOverlay(canvas, overlayMatrix, drawSize, '#FFAA55');
@@ -215,5 +251,14 @@ var generateOverlay = function(text, version) {
   <div id="device-background">
     <canvas id="watchface"></canvas>
   </div>
+
+
+  <div id="share-container">
+    <a id="share-link" href="#" onclick="shareClick()">Share QR Code</a>
+    <span id="share-msg"></span>
+  </div>
+  
+
+  <a href="https://github.com/andyehou/qr_code"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png" alt="Fork me on GitHub"></a>
 </body>
 </html>
