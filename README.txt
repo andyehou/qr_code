@@ -7,3 +7,6 @@ It is used in the index.html demo to display a concept Pebble Time watchface tha
 the current date and time in a QR code that changes every second. The human readable time
 is display as a color overlay above the QR code. The QR code is still readable due to its
 built in error correction.
+
+Live Demo:
+http://andyehou.github.io/qr_code
